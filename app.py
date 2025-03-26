@@ -1,42 +1,36 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+import yfinance as yf
 from financial_analyst import financial_analyst
 
-def main():
-    st.title("AI Financial Analyst App")
+# Streamlit UI
+st.title("📈 Stock Analyst AI")
+st.write("Analyze stocks with AI-driven insights!")
 
-    company_name = st.text_input("Company name:")
-    analyze_button = st.button("Analyze")
+# User input
+request = st.text_input("Enter a stock name or request (e.g., 'Analyze Google Stock')")
 
-    if analyze_button:
-        if company_name:
-            st.write("Analyzing... Please wait.")
+if st.button("Analyze"):
+    if request:
+        st.write("Processing your request... 🔍")
+        
+        # Get investment thesis & stock data
+        investment_thesis, hist = financial_analyst(request)
+        
+        # Display investment thesis
+        st.subheader("📊 Investment Thesis / Recommendation")
+        st.write(investment_thesis)
 
-            investment_thesis, hist = financial_analyst(company_name)
-
-            # Select 'Open' and 'Close' columns from the hist dataframe
-            hist_selected = hist[['Open', 'Close']]
-
-            # Create a new figure in matplotlib
-            fig, ax = plt.subplots()
-
-            # Plot the selected data
-            hist_selected.plot(kind='line', ax=ax)
-
-            # Set the title and labels
-            ax.set_title(f"{company_name} Stock Price")
-            ax.set_xlabel("Date")
-            ax.set_ylabel("Stock Price")
-
-            # Display the plot in Streamlit
+        # Plot stock evolution if available
+        if hist is not None and not hist.empty:
+            st.subheader("📈 Stock Evolution")
+            fig, ax = plt.subplots(figsize=(10, 5))
+            hist["Close"].plot(ax=ax, title="Stock Closing Prices Over Time")
             st.pyplot(fig)
-
-            st.write("Investment Thesis / Recommendation:")
-
-            st.markdown(investment_thesis, unsafe_allow_html=True)
         else:
-            st.write("Please enter the company name.")
+            st.write("No stock data available.")
 
+    else:
+        st.warning("⚠️ Please enter a valid stock request.")
 
-if __name__ == "__main__":
-    main()
+# Run with: `streamlit run streamlit_app.py`
