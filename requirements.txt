@@ -5,3 +5,4 @@ yahooquery
 openai
 streamlit
 matplotlib
+google-generativeai
